@@ -103,24 +103,34 @@
         }
     }
 
-    // Function to fetch a PDF file and create a link
-    function fetchPDF(pdfName, isTomorrow) {
-        const pdfUrl = 'https://4vsk.jelgava.lv/images/2023_2024/izmainas/feb/' + pdfName;
+// Function to fetch a PDF file and create a link
+function fetchPDF(pdfName, isTomorrow) {
+    const pdfUrl = 'https://4vsk.jelgava.lv/images/2023_2024/izmainas/feb/' + pdfName;
 
-        // Create a link element for the PDF
-        let pdfList = document.getElementById('pdfList');
-        let listItem = document.createElement('li');
-        let link = document.createElement('a');
-        link.href = pdfUrl;
-        link.textContent = getPDFLinkText(pdfName);
-        listItem.appendChild(link);
-        pdfList.appendChild(listItem);
-
-        // Remove tomorrow's PDF link if it doesn't exist
-        if (isTomorrow && link.textContent.includes('File not found')) {
-            pdfList.removeChild(listItem);
-        }
-    }
+    // Check if the PDF exists
+    fetch(pdfUrl)
+        .then(response => {
+            if (!response.ok) {
+                // If PDF doesn't exist, return early
+                if (isTomorrow) {
+                    return; // Skip tomorrow's PDF
+                } else {
+                    throw new Error('File not found');
+                }
+            }
+            // Create a link element for the PDF
+            let pdfList = document.getElementById('pdfList');
+            let listItem = document.createElement('li');
+            let link = document.createElement('a');
+            link.href = pdfUrl;
+            link.textContent = getPDFLinkText(pdfName);
+            listItem.appendChild(link);
+            pdfList.appendChild(listItem);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+}
 
     // Function to get PDF link text based on date
     function getPDFLinkText(pdfName) {
