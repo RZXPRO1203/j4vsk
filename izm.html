@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Izmaiņas - J4Vsk</title>
+<style>
+    body {
+        background-color: #121212; /* Dark background color */
+        color: #ffffff; /* Light text color */
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        margin: 0; /* Reset default margin */
+    }
+
+    h1 {
+        color: #ffca28; /* Yellow color for headings */
+    }
+
+    .warning {
+        background-color: #ffca28; /* Yellow background color for warning */
+        color: #121212; /* Dark text color */
+        padding: 10px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+
+    .close {
+        float: right;
+        cursor: pointer;
+    }
+
+    #pdfList {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    #pdfList li {
+        margin-bottom: 10px;
+    }
+
+    #pdfList li a {
+        color: #00bfff; /* Light blue color for PDF links */
+        text-decoration: none;
+    }
+
+    #pdfList li a:hover {
+        text-decoration: underline;
+    }
+
+    footer {
+        background-color: #1f1f1f; /* Dark background color for footer */
+        color: #ffffff; /* Light text color for footer */
+        padding: 10px;
+        text-align: center;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+    }
+</style>
+</head>
+<body>
+<div class="warning">
+    <span>Ja neredzat PDF failus, jums ir jāpievieno CORS Unblock.</span>
+    <span class="close" onclick="this.parentElement.style.display='none';">&times;</span>
+</div>
+
+<h1>Izmaiņas</h1>
+<ul id="pdfList">
+    <!-- PDF files will be dynamically added here -->
+</ul>
+
+<footer>
+    <p>&copy; 2024 J4Vsk</p>
+</footer>
+
+<script>
+    // Function to format date as 'Izm_DD_MM_YY.pdf'
+    function formatDate(date) {
+        let day = date.getDate().toString().padStart(2, '0');
+        let month = (date.getMonth() + 1).toString().padStart(2, '0');
+        let year = date.getFullYear().toString().slice(-2);
+        return `Izm_${day}_${month}_${year}.pdf`;
+    }
+
+    // Function to fetch PDF files for the last 7 days and tomorrow
+    function fetchPDFs() {
+        let today = new Date();
+        let pdfList = document.getElementById('pdfList');
+        
+        for (let i = 0; i < 8; i++) {
+            let date = new Date(today);
+            date.setDate(today.getDate() - i);
+            let pdfName = formatDate(date);
+
+            // Skip tomorrow's PDF if it doesn't exist yet
+            if (i === 0) {
+                let tomorrowPDF = formatDate(new Date(today.setDate(today.getDate() + 1)));
+                fetchPDF(tomorrowPDF, true);
+            } else {
+                fetchPDF(pdfName, false);
+            }
+        }
+    }
+
+// Function to fetch a PDF file and create a link
+function fetchPDF(pdfName, isTomorrow) {
+    // Define the URL of the proxy script
+    const proxyUrl = 'https://your-website-url.com/proxy.php?pdf=' + pdfName;
+
+    // Create a link element for the PDF
+    let pdfList = document.getElementById('pdfList');
+    let listItem = document.createElement('li');
+    let link = document.createElement('a');
+    link.href = proxyUrl;
+    link.textContent = getPDFLinkText(pdfName);
+    listItem.appendChild(link);
+    pdfList.appendChild(listItem);
+
+    // Remove tomorrow's PDF link if it doesn't exist
+    if (isTomorrow && link.textContent.includes('File not found')) {
+        pdfList.removeChild(listItem);
+    }
+}
+
+
+    // Function to get PDF link text based on date
+    function getPDFLinkText(pdfName) {
+        let today = new Date();
+        let date = new Date(
+            parseInt(pdfName.split('_')[3].split('.')[0], 10) + 2000,
+            parseInt(pdfName.split('_')[2], 10) - 1,
+            parseInt(pdfName.split('_')[1], 10)
+        );
+        let diff = Math.floor((today - date) / (1000 * 3600 * 24));
+
+        switch (diff) {
+            case 0:
+                return 'Šodien';
+            case 1:
+                return 'Vakar';
+            case -1:
+                return 'Rīt'; // Corrected for tomorrow's file
+            default:
+                if (diff < 0) {
+                    return 'Nākamajā dienā'; // For future dates
+                } else {
+                    return `Pirms ${diff} dienām`;
+                }
+        }
+    }
+
+    // Call fetchPDFs function when the page loads
+    window.onload = fetchPDFs;
+</script>
+</body>
+</html>
