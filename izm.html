@@ -103,26 +103,24 @@
         }
     }
 
-// Function to fetch a PDF file and create a link
-function fetchPDF(pdfName, isTomorrow) {
-    // Define the URL of the proxy script
-    const proxyUrl = 'https://rzxpro1203.github.io/j4vsk/proxy.php?pdf=' + pdfName;
+    // Function to fetch a PDF file and create a link
+    function fetchPDF(pdfName, isTomorrow) {
+        const pdfUrl = 'https://4vsk.jelgava.lv/images/2023_2024/izmainas/feb/' + pdfName;
 
-    // Create a link element for the PDF
-    let pdfList = document.getElementById('pdfList');
-    let listItem = document.createElement('li');
-    let link = document.createElement('a');
-    link.href = proxyUrl;
-    link.textContent = getPDFLinkText(pdfName);
-    listItem.appendChild(link);
-    pdfList.appendChild(listItem);
+        // Create a link element for the PDF
+        let pdfList = document.getElementById('pdfList');
+        let listItem = document.createElement('li');
+        let link = document.createElement('a');
+        link.href = pdfUrl;
+        link.textContent = getPDFLinkText(pdfName);
+        listItem.appendChild(link);
+        pdfList.appendChild(listItem);
 
-    // Remove tomorrow's PDF link if it doesn't exist
-    if (isTomorrow && link.textContent.includes('File not found')) {
-        pdfList.removeChild(listItem);
+        // Remove tomorrow's PDF link if it doesn't exist
+        if (isTomorrow && link.textContent.includes('File not found')) {
+            pdfList.removeChild(listItem);
+        }
     }
-}
-
 
     // Function to get PDF link text based on date
     function getPDFLinkText(pdfName) {
